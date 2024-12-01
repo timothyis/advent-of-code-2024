@@ -8,18 +8,21 @@ const lists = decoder.decode(data);
 // 3   9
 // 3   3`;
 
-const findTotalDistanceFromLists = (list: string) => {
+const parseAndSortLists = (listsString: string) => {
   const listOne: number[] = [];
   const listTwo: number[] = [];
 
-  list.split("\n").forEach((pair) => {
+  listsString.split("\n").forEach((pair) => {
     const [firstNumber, secondNumber] = pair.split(/\s+/);
     listOne.push(Number(firstNumber));
     listTwo.push(Number(secondNumber));
   });
 
-  listOne.sort();
-  listTwo.sort();
+  return [listOne.sort(), listTwo.sort()];
+};
+
+const findTotalDistanceFromLists = (listString: string) => {
+  const [listOne, listTwo] = parseAndSortLists(listString);
 
   return listOne.reduce(
     (acc, number, index) => acc + Math.abs(number - listTwo[index]),
@@ -27,4 +30,22 @@ const findTotalDistanceFromLists = (list: string) => {
   );
 };
 
-console.log(findTotalDistanceFromLists(lists));
+const findDuplicateAmounts = (listString: string) => {
+  const [listOne, listTwo] = parseAndSortLists(listString);
+
+  const listTwoDuplicateCounts = new Map();
+
+  listTwo.forEach((number) => {
+    listTwoDuplicateCounts.set(
+      number,
+      listTwoDuplicateCounts.get(number) + 1 || 1,
+    );
+  });
+
+  return listOne.reduce((acc, number) => {
+    return acc + (number * listTwoDuplicateCounts.get(number) || 0);
+  }, 0);
+};
+
+console.log("Part 1 answer:", findTotalDistanceFromLists(lists));
+console.log("Part 2 answer:", findDuplicateAmounts(lists));
